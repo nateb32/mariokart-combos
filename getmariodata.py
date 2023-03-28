@@ -1,0 +1,57 @@
+import itertools
+
+import pandas as pd
+import requests
+
+
+## ----- PULL IN MARIO KART DATA ---
+def pullwiki():
+    html = requests.get(
+        "https://www.mariowiki.com/Mario_Kart_8_Deluxe_in-game_statistics",
+        verify=True,
+        timeout=2,
+    )
+
+    dfs = pd.read_html(html.text, skiprows=1, header=0)
+
+    drivers = dfs[0][:-1].set_index(["Driver"]).astype("int")
+    vehicles = dfs[1].set_index(["Body"]).astype("int")
+    tires = dfs[2].set_index(["Tire"]).astype("int")
+    gliders = dfs[3].set_index(["Glider"]).astype("int")
+
+    # Format driver names
+    drivernames = list(drivers.index)
+    # remove any numbers
+    drivernames = [
+        "".join([i for i in drivernames[ii] if not i.isdigit()])
+        for ii in range(0, len(drivernames))
+    ]
+    # remove spaces if they are the last character
+    drivernames = [
+        "".join(drivernames[ii].rstrip()) for ii in range(0, len(drivernames))
+    ]
+    # remove last word of each name (callsign) BUT only remove if it is not a parenthesis
+    drivernames = [ii.rsplit(" ", 1)[0] if ii[-1] != ")" else ii for ii in drivernames]
+
+    # Reset driver index
+    drivers.index = drivernames
+
+    combos = list(
+        itertools.product(drivers.index, vehicles.index, tires.index, gliders.index)
+    )
+
+    cStats_list = list(
+        itertools.product(drivers.values, vehicles.values, tires.values, gliders.values)
+    )
+
+    cStats_summed = [(sum(cStats_list[ii]) + 3) / 4 for ii in range(len(cStats_list))]
+
+    comboStats = pd.concat(
+        [
+            pd.DataFrame(combos, columns=["Driver", "Body", "Tires", "Glider"]),
+            pd.DataFrame(cStats_summed, columns=list(drivers.columns)),
+        ],
+        axis=1,
+    )
+    # Write to CSV if you want to
+    comboStats.to_csv("MarioKart8D_Combos.csv", index=False)
