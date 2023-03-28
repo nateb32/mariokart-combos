@@ -89,24 +89,6 @@ if compsubmitted:
         mashsetup = [setup1, setup2, setup3, setup4]
 
     comparisonDF = pd.concat(mashsetup).reset_index(drop=True)
-    ### PLACES ALL INFO IN FIRST COLUMN
-    # make attributes into one column
-    # infocol = (
-    #     comparisonDF["Driver"]
-    #     + "+"
-    #     + comparisonDF["Body"]
-    #     + "+"
-    #     + comparisonDF["Tires"]
-    #     + "+"
-    #     + comparisonDF["Glider"]
-    # )
-    # # make names unique for duplicate setups
-    # infocol = pd.Series(
-    #     [
-    #         str(infocol.index[ii] + 1) + ": " + infocol.iloc[ii]
-    #         for ii in range(0, len(infocol))
-    #     ]
-    # )
     infocol = pd.Series(
         [
             "Setup " + str(comparisonDF.index[ii] + 1)
