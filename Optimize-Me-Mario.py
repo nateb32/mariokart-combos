@@ -8,8 +8,15 @@ import tools
 
 ## ----- MAKE WEBPAGE -----
 st.set_page_config(page_title="Optimize-Me-Mario", layout="wide")
+hide_menu_style = """
+        <style>
+        #MainMenu {visibility: hidden;}
+        </style>
+        """
+st.markdown(hide_menu_style, unsafe_allow_html=True)
 
-st.header("Let's :orange[_Discover_] Your Racers!")
+st.image("Racer Optimization Tool.png")
+st.subheader(":orange[_Discover_] Your Racers!")
 st.markdown(
     ":violet[Select priorities and filtering in the sidebar for more useful results.]"
 )

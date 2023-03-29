@@ -10,7 +10,7 @@ from matplotlib.ticker import MaxNLocator
 
 import tools
 
-st.header("Let's :orange[_Compare_] Your Racers!")
+st.subheader(":orange[_Compare_] Your Racers!")
 st.markdown(":violet[Select the setups you would like to compare in the sidebar.]")
 ## ----- BRING IN DATA -----
 full_combosDF = tools.readData("MarioKart8D_Combos.csv")
@@ -126,3 +126,4 @@ if compsubmitted:
     )
 
     st.altair_chart(chart, theme="streamlit")
+st.image("Racer Optimization Tool.png")
