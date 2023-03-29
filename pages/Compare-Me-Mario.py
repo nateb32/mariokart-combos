@@ -1,14 +1,12 @@
-from os.path import exists
-
 import altair as alt
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-import seaborn as sns
 import streamlit as st
-from matplotlib.ticker import MaxNLocator
+from streamlit_extras.buy_me_a_coffee import button
 
 import tools
+
+with st.sidebar:
+    button(username="natebrawn", floating=False, width=221)
 
 st.subheader(":orange[_Compare_] Your Racers!")
 st.markdown(":violet[Select the setups you would like to compare in the sidebar.]")

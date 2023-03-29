@@ -1,7 +1,5 @@
-from os.path import exists
-
-import pandas as pd
 import streamlit as st
+from streamlit_extras.buy_me_a_coffee import button
 
 import getmariodata
 import tools
@@ -14,6 +12,13 @@ hide_menu_style = """
         </style>
         """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
+
+# col1, col2 = st.columns([4, 1])
+# with col2:
+#     button(username="natebrawn", floating=False, width=221)
+
+with st.sidebar:
+    button(username="natebrawn", floating=False, width=221)
 
 st.image("Racer Optimization Tool.png")
 st.subheader(":orange[_Discover_] Your Racers!")
