@@ -1,7 +1,12 @@
 from os.path import exists
 
+import altair as alt
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+import seaborn as sns
 import streamlit as st
+from matplotlib.ticker import MaxNLocator
 
 import tools
 
@@ -88,16 +93,36 @@ if compsubmitted:
         setup4 = getsetup(full_combosDF, rc4, bc4, tc4, gc4)
         mashsetup = [setup1, setup2, setup3, setup4]
 
-    comparisonDF = pd.concat(mashsetup).reset_index(drop=True)
-    infocol = pd.Series(
+    comparisonDF = pd.concat(mashsetup).transpose()
+    comparisonDF = pd.concat(
         [
-            "Setup " + str(comparisonDF.index[ii] + 1)
-            for ii in range(0, len(comparisonDF))
-        ]
+            pd.Series(comparisonDF.iloc[4:, :].index),
+            pd.DataFrame(comparisonDF.iloc[4:, :].values),
+        ],
+        axis=1,
     )
-    comparisonDF = pd.concat([infocol, comparisonDF.iloc[:, 4:]], axis=1)
-    comparisonDF = comparisonDF.set_index(0).transpose()
-    st.dataframe(comparisonDF)
+    comparisonDF.columns = ["Stats"] + [
+        "Setup " + str(snum) for snum in range(1, st.session_state.numsetups + 1)
+    ]
 
-    st.area_chart(comparisonDF)
-    st.bar_chart(comparisonDF)
+    valuecols = list(comparisonDF.columns[1:])
+    meltedComps = pd.melt(comparisonDF, id_vars=["Stats"], value_vars=valuecols)
+    st.dataframe(comparisonDF)
+    chart = (
+        alt.Chart(meltedComps, title="Racer Setup Comparison")
+        .mark_bar(
+            opacity=0.8,
+        )
+        .encode(
+            column=alt.Column(
+                "Stats:O",
+                spacing=5,
+                header=alt.Header(labelOrient="bottom", labelColor="green"),
+            ),
+            x=alt.X("variable", sort=valuecols, axis=None),
+            y=alt.Y("value:Q"),
+            color=alt.Color("variable"),
+        )
+    )
+
+    st.altair_chart(chart, theme="streamlit")
