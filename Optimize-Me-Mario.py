@@ -102,7 +102,10 @@ setupcols = allcombocols[: allcombocols.index("WG")]
 # In-Game Stats Only Button
 gamestatsbutt = butt4.checkbox("Only In-Game Stats")
 if gamestatsbutt:
-    combosDF = combosDF[setupcols + ingamestats_abrev]
+    if opticols:
+        combosDF = combosDF[setupcols + ingamestats_abrev + opticols]
+    else:
+        combosDF = combosDF[setupcols + ingamestats_abrev]
 
 # Stat Names Button
 statnamesbutt = butt2.checkbox("Show Stat Names")
