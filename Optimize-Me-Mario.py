@@ -87,9 +87,13 @@ if butt5.checkbox("Remove Gliders"):
 
 # Optimized Sorting Button
 # Sorts by sum of mini-turbo and then total sum
-if butt1.checkbox("Optimized Sort", help="Sorts by MT+SL then total sum of all points"):
-    combosDF["TotalPts"] = combosDF.iloc[:, 4:].sum(axis=1)
-    combosDF["MT+SL"] = combosDF["MT"] + combosDF["SL"]
+optisortbutt = butt1.checkbox(
+    "Optimized Sort", help="Sorts by MT+SL then total sum of all points"
+)
+if optisortbutt:
+    opticols = ["Total Pts", "MT+SL"]
+    combosDF[opticols[1]] = combosDF.iloc[:, 4:].sum(axis=1)
+    combosDF[opticols[2]] = combosDF["MT"] + combosDF["SL"]
     combosDF = combosDF.sort_values(by=["MT+SL", "TotalPts"], ascending=False)
 
 allcombocols = list(combosDF.columns)
@@ -104,9 +108,15 @@ if gamestatsbutt:
 statnamesbutt = butt2.checkbox("Show Stat Names")
 if statnamesbutt:
     if gamestatsbutt:
-        combosDF.columns = setupcols + ingamestats
+        if optisortbutt:
+            combosDF.columns = setupcols + ingamestats + opticols
+        else:
+            combosDF.columns = setupcols + ingamestats
     else:
-        combosDF.columns = setupcols + allstats
+        if optisortbutt:
+            combosDF.columns = setupcols + allstats + opticols
+        else:
+            combosDF.columns = setupcols + allstats
 
 # HeatMap Button
 heatmapbutt = butt3.checkbox("Show HeatMap")
