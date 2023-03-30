@@ -67,14 +67,74 @@ ingamestats_abrev = [
     "OF",
 ]
 
+## ----- DISPLAY DATAFRAME -----
+combosDF = combosDF.reset_index(drop=True)
+
+# Show only top 1000 values
+maxrows = len(combosDF)
+numrows = maxrows
+if maxrows > 1000:
+    numrows = 1000
+    combosDF = combosDF.iloc[:numrows, :]
+
+## OPTION BUTTONS
+butt1, butt2, butt3, butt4, butt5 = st.columns(5)
+
+# Remove glider
+if butt5.checkbox("Remove Gliders"):
+    combosDF = tools.readData("MarioKart8D_Combos_nogliders.csv")
+
+
+# Optimized Sorting Button
+# Sorts by sum of mini-turbo and then total sum
+if butt4.checkbox("Optimized Sort", help="Sorts by MT+SL then total sum of all points"):
+    combosDF["TotalPts"] = combosDF.iloc[:, 4:].sum(axis=1)
+    combosDF["MT+SL"] = combosDF["MT"] + combosDF["SL"]
+    combosDF = combosDF.sort_values(by=["MT+SL", "TotalPts"], ascending=False)
+
+allcombocols = list(combosDF.columns)
+setupcols = allcombocols[: allcombocols.index("WG")]
+
+# In-Game Stats Only Button
+gamestatsbutt = butt1.checkbox("Only In-Game Stats")
+if gamestatsbutt:
+    combosDF = combosDF[setupcols + ingamestats_abrev]
+
+# Stat Names Button
+statnamesbutt = butt2.checkbox("Show Stat Names")
+if statnamesbutt:
+    if gamestatsbutt:
+        combosDF.columns = setupcols + ingamestats
+    else:
+        combosDF.columns = setupcols + allstats
+
+# HeatMap Button
+heatmapbutt = butt3.checkbox("Show HeatMap")
+if heatmapbutt:
+    if maxrows >= 100:
+        numrows = 100
+    heatstyler = (
+        combosDF.iloc[:numrows, :]
+        .style.format(precision=2)
+        .background_gradient(
+            axis=0,
+            vmin=0,
+            vmax=6,
+            subset=list(combosDF.columns.values[4:]),
+            cmap="YlOrRd",
+        )
+        .set_table_styles([dict(selector="th", props=[("text-align", "center")])])
+    )
+    maindata = heatstyler.set_properties(**{"text-align": "center"}).hide(axis="index")
+else:
+    maindata = combosDF
+
 
 ## ----- PRIORITIES FORM -----
 @st.cache_data
 def sortDF(combosDF, sortby):
     return combosDF.sort_values(by=sortby, ascending=False)
 
-
-setupcols = ["Driver", "Body", "Tires", "Glider"]
 
 with st.sidebar.form("priorities"):
     st.subheader(":green[PRIORITIZE YOUR STATS:]")
@@ -118,65 +178,6 @@ with st.sidebar.form("filters"):
     combosDF = filterDF(
         combosDF, racer_filter, body_filter, tires_filter, glider_filter
     )
-
-## ----- DISPLAY DATAFRAME -----
-combosDF = combosDF.reset_index(drop=True)
-
-# Show only top 1000 values
-maxrows = len(combosDF)
-numrows = maxrows
-if maxrows > 1000:
-    numrows = 1000
-    combosDF = combosDF.iloc[:numrows, :]
-
-## OPTION BUTTONS
-butt1, butt2, butt3, butt4, butt5 = st.columns(5)
-
-# Remove glider
-if butt5.checkbox("Remove Gliders"):
-    combosDF = tools.readData("MarioKart8D_Combos_nogliders.csv")
-
-
-# Optimized Sorting Button
-# Sorts by sum of mini-turbo and then total sum
-if butt4.checkbox("Optimized Sort", help="Sorts by MT+SL then total sum of all points"):
-    combosDF["TotalPts"] = combosDF.iloc[:, 4:].sum(axis=1)
-    combosDF["MT+SL"] = combosDF["MT"] + combosDF["SL"]
-    combosDF = combosDF.sort_values(by=["MT+SL", "TotalPts"], ascending=False)
-
-# In-Game Stats Only Button
-gamestatsbutt = butt1.checkbox("Only In-Game Stats")
-if gamestatsbutt:
-    combosDF = combosDF[setupcols + ingamestats_abrev]
-
-# Stat Names Button
-statnamesbutt = butt2.checkbox("Show Stat Names")
-if statnamesbutt:
-    if gamestatsbutt:
-        combosDF.columns = setupcols + ingamestats
-    else:
-        combosDF.columns = setupcols + allstats
-
-# HeatMap Button
-heatmapbutt = butt3.checkbox("Show HeatMap")
-if heatmapbutt:
-    if maxrows >= 100:
-        numrows = 100
-    heatstyler = (
-        combosDF.iloc[:numrows, :]
-        .style.format(precision=2)
-        .background_gradient(
-            axis=0,
-            vmin=0,
-            vmax=6,
-            subset=list(combosDF.columns.values[4:]),
-            cmap="YlOrRd",
-        )
-        .set_table_styles([dict(selector="th", props=[("text-align", "center")])])
-    )
-    maindata = heatstyler.set_properties(**{"text-align": "center"}).hide(axis="index")
-else:
-    maindata = combosDF
 
 # Display Main DataFrame
 st.dataframe(maindata)
