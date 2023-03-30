@@ -1,4 +1,5 @@
 import numpy as np
+import plotly.express as px
 import streamlit as st
 from streamlit_extras.buy_me_a_coffee import button
 
@@ -182,7 +183,8 @@ st.markdown(
 )
 
 ## ----- TOP SETUP -----
-if st.button(
+excol1, excol2 = st.columns(2)
+if excol1.button(
     "What are the highest scored setups?", help="Scored by aggregate sum of all stats"
 ):
     summedstats = full_combosDF.iloc[:, 4:].sum(axis=1)
@@ -191,6 +193,18 @@ if st.button(
     bestsetups = full_combosDF.iloc[max_idxs]
     st.dataframe(bestsetups)
 
+# GRAPH MINI_TURBO TO GROUND SPEED
+if excol2.button("I like graphs. Show me a Mini-Turbo vs Ground Speed one"):
+    dualstats = full_combosDF[["MT", "SL"]]
+
+    fig = px.scatter(
+        dualstats,
+        x="MT",
+        y="SL",
+        title="Mini-Turbo vs Ground Speed for All Data",
+        labels={"MT": "Mini-Turbo", "SL": "Ground Speed"},
+    )
+    st.plotly_chart(fig, theme="streamlit")
 
 ## ----- PROMPT TO PULL IN MARIO KART DATA ---
 st.sidebar.subheader(":blue[Stats out-of-date? Tap this button ↓]")
