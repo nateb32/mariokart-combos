@@ -92,8 +92,8 @@ optisortbutt = butt1.checkbox(
 )
 if optisortbutt:
     opticols = ["Total Pts", "MT+SL"]
-    combosDF[opticols[1]] = combosDF.iloc[:, 4:].sum(axis=1)
-    combosDF[opticols[2]] = combosDF["MT"] + combosDF["SL"]
+    combosDF[opticols[0]] = combosDF.iloc[:, 4:].sum(axis=1)
+    combosDF[opticols[1]] = combosDF["MT"] + combosDF["SL"]
     combosDF = combosDF.sort_values(by=["MT+SL", "TotalPts"], ascending=False)
 
 allcombocols = list(combosDF.columns)
