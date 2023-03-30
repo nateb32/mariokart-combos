@@ -23,7 +23,7 @@ with st.sidebar:
     button(username="natebrawn", floating=False, width=221)
 
 st.image("Racer Optimization Tool.png")
-st.subheader(":orange[_Discover_] Your Racers!")
+# st.subheader(":orange[_Discover_] Your Racers!")
 st.markdown(
     ":violet[Select priorities and filtering in the sidebar for more useful results.]"
 )
