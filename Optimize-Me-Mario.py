@@ -1,13 +1,11 @@
-import numpy as np
-import pandas as pd
 import plotly.express as px
 import streamlit as st
 from streamlit_extras.buy_me_a_coffee import button
 
-import getmariodata
+# import getmariodata
 import tools
 
-## ----- MAKE WEBPAGE -----
+# ----- MAKE WEBPAGE -----
 st.set_page_config(page_title="Optimize-Me-Mario", layout="wide")
 
 # Hide hamburger menu
@@ -29,7 +27,7 @@ st.markdown(
     ":violet[Select priorities and filtering in the sidebar for more useful results.]"
 )
 
-## ----- Read In CSV Data -----
+# ----- Read In CSV Data -----
 full_combosDF = tools.readData("MarioKart8D_Combos.csv")
 combosDF = full_combosDF
 # Get unique values of each item:
@@ -67,7 +65,7 @@ ingamestats_abrev = [
     "OF",
 ]
 
-## ----- DISPLAY DATAFRAME -----
+# ----- DISPLAY DATAFRAME -----
 combosDF = combosDF.reset_index(drop=True)
 
 # Show only top 1000 values
@@ -77,7 +75,7 @@ if maxrows > 1000:
     numrows = 1000
     combosDF = combosDF.iloc[:numrows, :]
 
-## OPTION BUTTONS
+# OPTION BUTTONS
 butt1, butt2, butt3, butt4, butt5 = st.columns(5)
 
 # Remove glider
@@ -138,12 +136,13 @@ if heatmapbutt:
         )
         .set_table_styles([dict(selector="th", props=[("text-align", "center")])])
     )
-    maindata = heatstyler.set_properties(**{"text-align": "center"}).hide(axis="index")
+    maindata = heatstyler.set_properties(
+        **{"text-align": "center"}).hide(axis="index")
 else:
     maindata = combosDF
 
 
-## ----- PRIORITIES FORM -----
+# ----- PRIORITIES FORM -----
 @st.cache_data
 def sortDF(combosDF, sortby):
     return combosDF.sort_values(by=sortby, ascending=False)
@@ -163,11 +162,12 @@ with st.sidebar.form("priorities"):
         combosDF = sortDF(combosDF, sortvals)
 
 
-## ----- FILTERS FORM -----
+# ----- FILTERS FORM -----
 @st.cache_data
 def filterDF(combosDF, racer_filter, body_filter, tires_filter, glider_filter):
     if any(
-        [racer_filter != [], body_filter != [], tires_filter != [], glider_filter != []]
+        [racer_filter != [], body_filter != [],
+            tires_filter != [], glider_filter != []]
     ):
         if racer_filter != []:
             combosDF = combosDF[combosDF.Driver.isin(racer_filter)]
@@ -204,7 +204,7 @@ st.markdown(
     + "] **:orange[options]**"
 )
 
-## ----- BEST SETUPS -----
+# ----- BEST SETUPS -----
 excol1, excol2 = st.columns(2)
 if excol1.button(
     "What are the highest scored setups?", help="Scored by aggregate sum of all stats"
@@ -228,13 +228,15 @@ if excol2.button("I like graphs. Show me a Mini-Turbo vs Ground Speed one"):
     )
     st.plotly_chart(fig, theme="streamlit")
 
-## ----- PROMPT TO PULL IN MARIO KART DATA ---
+# ----- PROMPT TO PULL IN MARIO KART DATA ---
 st.sidebar.subheader(":orange[Stats out-of-date? ↓]")
-if st.sidebar.button("Get New Data"):
-    with st.spinner(text="Pulling in Mario Kart Data..."):
-        getmariodata.pullwiki()
-        st.balloons()
-        st.success("Done!")
+getnewdatabutt = st.sidebar.button("Get New Data")
+if getnewdatabutt:
+    st.write("Your request has been sent to the developer")
+#     with st.spinner(text="Pulling in Mario Kart Data..."):
+#         getmariodata.pullwiki()
+#         st.balloons()
+#         st.success("Done!")
 
 st.sidebar.markdown(
     ":violet[All data is from www.mariowiki.com/Mario_Kart_8_Deluxe_in-game_statistics]"

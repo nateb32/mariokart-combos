@@ -1,16 +1,16 @@
-from os.path import exists
+# from os.path import exists
 
 import pandas as pd
 import streamlit as st
 
-import getmariodata
+# import getmariodata
 
 
 ## ----- Read In CSV Data -----
 @st.cache_data
 def readData(csvfile):
-    if not exists(csvfile):
-        getmariodata.pullwiki()
+    # if not exists(csvfile):
+    #     getmariodata.pullwiki()
     return pd.read_csv(csvfile, index_col=False)
 
 

@@ -1,4 +1,4 @@
-import itertools
+from itertools import product
 
 import pandas as pd
 import requests
@@ -36,21 +36,15 @@ def pullwiki():
     # Reset driver index
     drivers.index = drivernames
 
-    combos = list(
-        itertools.product(drivers.index, vehicles.index, tires.index, gliders.index)
-    )
+    combos = list(product(drivers.index, vehicles.index, tires.index, gliders.index))
 
-    combos_nogliders = list(
-        itertools.product(drivers.index, vehicles.index, tires.index)
-    )
+    combos_nogliders = list(product(drivers.index, vehicles.index, tires.index))
 
     cStats_list = list(
-        itertools.product(drivers.values, vehicles.values, tires.values, gliders.values)
+        product(drivers.values, vehicles.values, tires.values, gliders.values)
     )
 
-    cStats_list_nogliders = list(
-        itertools.product(drivers.values, vehicles.values, tires.values)
-    )
+    cStats_list_nogliders = list(product(drivers.values, vehicles.values, tires.values))
 
     cStats_summed = [(sum(cStats_list[ii]) + 3) / 4 for ii in range(len(cStats_list))]
     cStats_summed_nogliders = [
