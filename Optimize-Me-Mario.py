@@ -193,7 +193,7 @@ with st.sidebar.form("filters"):
     )
 
 # Display Main DataFrame
-st.dataframe(maindata)
+st.dataframe(maindata, use_container_width=True)
 
 # Information below the dataframe
 st.markdown(
