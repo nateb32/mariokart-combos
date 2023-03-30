@@ -201,13 +201,13 @@ if excol2.button("I like graphs. Show me a Mini-Turbo vs Ground Speed one"):
     st.plotly_chart(fig, theme="streamlit")
 
 ## ----- PROMPT TO PULL IN MARIO KART DATA ---
-st.sidebar.subheader(":blue[Stats out-of-date? Tap this button ↓]")
+st.sidebar.subheader(":orange[Stats out-of-date? ↓]")
 if st.sidebar.button("Get New Data"):
     with st.spinner(text="Pulling in Mario Kart Data..."):
         getmariodata.pullwiki()
         st.balloons()
         st.success("Done!")
 
-st.sidebar.write(
-    "All data is from https://www.mariowiki.com/Mario_Kart_8_Deluxe_in-game_statistics"
+st.sidebar.markdown(
+    ":violet[All data is from www.mariowiki.com/Mario_Kart_8_Deluxe_in-game_statistics]"
 )
