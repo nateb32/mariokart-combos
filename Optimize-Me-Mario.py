@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import plotly.express as px
 import streamlit as st
 from streamlit_extras.buy_me_a_coffee import button
@@ -130,6 +131,19 @@ if maxrows > 1000:
 
 ## OPTION BUTTONS
 butt1, butt2, butt3, butt4, butt5 = st.columns(5)
+
+# Remove glider
+if butt5.checkbox("Remove Gliders"):
+    combosDF = tools.readData("MarioKart8D_Combos_nogliders.csv")
+
+
+# Optimized Sorting Button
+# Sorts by sum of mini-turbo and then total sum
+if butt4.checkbox("Optimized Sort", help="Sorts by MT+SL then total sum of all points"):
+    combosDF["TotalPts"] = combosDF.iloc[:, 4:].sum(axis=1)
+    combosDF["MT+SL"] = combosDF["MT"] + combosDF["SL"]
+    combosDF = combosDF.sort_values(by=["MT+SL", "TotalPts"], ascending=False)
+
 # In-Game Stats Only Button
 gamestatsbutt = butt1.checkbox("Only In-Game Stats")
 if gamestatsbutt:

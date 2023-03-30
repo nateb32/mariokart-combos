@@ -10,11 +10,8 @@ import getmariodata
 @st.cache_data
 def readData(csvfile):
     if not exists(csvfile):
-        with st.spinner(text="Pulling in Mario Kart Data..."):
-            getmariodata.pullwiki()
-            st.balloons()
-            st.success("Done!")
-    return pd.read_csv("MarioKart8D_Combos.csv", index_col=False)
+        getmariodata.pullwiki()
+    return pd.read_csv(csvfile, index_col=False)
 
 
 def getOptions(data):

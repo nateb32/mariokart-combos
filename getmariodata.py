@@ -40,11 +40,23 @@ def pullwiki():
         itertools.product(drivers.index, vehicles.index, tires.index, gliders.index)
     )
 
+    combos_nogliders = list(
+        itertools.product(drivers.index, vehicles.index, tires.index)
+    )
+
     cStats_list = list(
         itertools.product(drivers.values, vehicles.values, tires.values, gliders.values)
     )
 
+    cStats_list_nogliders = list(
+        itertools.product(drivers.values, vehicles.values, tires.values)
+    )
+
     cStats_summed = [(sum(cStats_list[ii]) + 3) / 4 for ii in range(len(cStats_list))]
+    cStats_summed_nogliders = [
+        (sum(cStats_list_nogliders[ii]) + 3) / 4
+        for ii in range(len(cStats_list_nogliders))
+    ]
 
     comboStats = pd.concat(
         [
@@ -53,5 +65,14 @@ def pullwiki():
         ],
         axis=1,
     )
+    comboStats_nogliders = pd.concat(
+        [
+            pd.DataFrame(combos_nogliders, columns=["Driver", "Body", "Tires"]),
+            pd.DataFrame(cStats_summed_nogliders, columns=list(drivers.columns)),
+        ],
+        axis=1,
+    )
+
     # Write to CSV if you want to
     comboStats.to_csv("MarioKart8D_Combos.csv", index=False)
+    comboStats_nogliders.to_csv("MarioKart8D_Combos_nogliders.csv", index=False)
