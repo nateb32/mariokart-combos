@@ -94,7 +94,7 @@ if optisortbutt:
     opticols = ["Total Pts", "MT+SL"]
     combosDF[opticols[0]] = combosDF.iloc[:, 4:].sum(axis=1)
     combosDF[opticols[1]] = combosDF["MT"] + combosDF["SL"]
-    combosDF = combosDF.sort_values(by=["MT+SL", "TotalPts"], ascending=False)
+    combosDF = combosDF.sort_values(by=opticols, ascending=False)
 
 allcombocols = list(combosDF.columns)
 setupcols = allcombocols[: allcombocols.index("WG")]
