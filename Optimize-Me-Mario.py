@@ -213,3 +213,7 @@ if st.sidebar.button("Get New Data"):
         getmariodata.pullwiki()
         st.balloons()
         st.success("Done!")
+
+st.markdown(
+    "Source for all this data: https://www.mariowiki.com/Mario_Kart_8_Deluxe_in-game_statistics"
+)
