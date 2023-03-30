@@ -8,6 +8,8 @@ import tools
 
 ## ----- MAKE WEBPAGE -----
 st.set_page_config(page_title="Optimize-Me-Mario", layout="wide")
+
+# Hide hamburger menu
 hide_menu_style = """
         <style>
         #MainMenu {visibility: hidden;}
@@ -15,13 +17,11 @@ hide_menu_style = """
         """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
 
-# col1, col2 = st.columns([4, 1])
-# with col2:
-#     button(username="natebrawn", floating=False, width=221)
-
+# Buy Me a Coffee Button
 with st.sidebar:
     button(username="natebrawn", floating=False, width=221)
 
+# HEADER IMAGE AND INFO
 st.image("Racer Optimization Tool.png")
 # st.subheader(":orange[_Discover_] Your Racers!")
 st.markdown(
@@ -34,14 +34,7 @@ combosDF = full_combosDF
 # Get unique values of each item:
 options = tools.getOptions(full_combosDF)
 
-
-## ----- PRIORITIES FORM -----
-@st.cache_data
-def sortDF(combosDF, sortby):
-    return combosDF.sort_values(by=sortby, ascending=False)
-
-
-setupcols = ["Driver", "Body", "Tires", "Glider"]
+# List out statistic names and abreviations
 allstats = [
     "Weight (WG)",
     "Acceleration (AC)",
@@ -72,6 +65,15 @@ ingamestats_abrev = [
     "TL",
     "OF",
 ]
+
+
+## ----- PRIORITIES FORM -----
+@st.cache_data
+def sortDF(combosDF, sortby):
+    return combosDF.sort_values(by=sortby, ascending=False)
+
+
+setupcols = ["Driver", "Body", "Tires", "Glider"]
 
 with st.sidebar.form("priorities"):
     st.subheader(":green[PRIORITIZE YOUR STATS:]")
@@ -119,11 +121,6 @@ with st.sidebar.form("filters"):
 ## ----- DISPLAY DATAFRAME -----
 combosDF = combosDF.reset_index(drop=True)
 
-# if "gamestatsbutt" not in st.session_state:
-#     gamestatsbutt = False
-# if "statnamesbutt" not in st.session_state:
-#     statnamesbutt = False
-
 # Show only top 1000 values
 maxrows = len(combosDF)
 numrows = maxrows
@@ -131,14 +128,11 @@ if maxrows > 1000:
     numrows = 1000
     combosDF = combosDF.iloc[:numrows, :]
 
-## --- OPTION BUTTONS
+## OPTION BUTTONS
 butt1, butt2, butt3, butt4, butt5 = st.columns(5)
 # In-Game Stats Only Button
 gamestatsbutt = butt1.checkbox("Only In-Game Stats")
 if gamestatsbutt:
-    # if statnamesbutt:
-    #     combosDF = combosDF[setupcols + ingamestats]
-    # else:
     combosDF = combosDF[setupcols + ingamestats_abrev]
 
 # Stat Names Button
@@ -182,7 +176,7 @@ st.markdown(
     + "] **:orange[options]**"
 )
 
-## ----- TOP SETUP -----
+## ----- BEST SETUPS -----
 excol1, excol2 = st.columns(2)
 if excol1.button(
     "What are the highest scored setups?", help="Scored by aggregate sum of all stats"
@@ -214,6 +208,6 @@ if st.sidebar.button("Get New Data"):
         st.balloons()
         st.success("Done!")
 
-st.markdown(
-    "Data from https://www.mariowiki.com/Mario_Kart_8_Deluxe_in-game_statistics"
+st.sidebar.write(
+    "All data is from https://www.mariowiki.com/Mario_Kart_8_Deluxe_in-game_statistics"
 )
