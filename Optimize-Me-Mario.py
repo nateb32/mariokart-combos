@@ -150,9 +150,11 @@ def sortDF(combosDF, sortby):
 
 with st.sidebar.form("priorities"):
     st.subheader(":green[PRIORITIZE YOUR STATS:]")
+    if gamestatsbutt:
+        statchoices = ingamestats
     statpriorities = st.multiselect(
         "Stat Priorities (order matters):",
-        allstats,
+        statchoices,
         help="In-Game Stats:  \n:blue[Ground Speed (SL)], :violet[Acceleration (AC)], :green[Weight (WG)],  \n:orange[Ground Handling (TL)], and :red[Off-Road Traction (OF)]",
     )
     sortvals = [prt[-3:-1] for prt in statpriorities]
@@ -164,19 +166,31 @@ with st.sidebar.form("priorities"):
 
 # ----- FILTERS FORM -----
 @st.cache_data
-def filterDF(combosDF, racer_filter, body_filter, tires_filter, glider_filter):
-    if any(
-        [racer_filter != [], body_filter != [],
-            tires_filter != [], glider_filter != []]
-    ):
-        if racer_filter != []:
-            combosDF = combosDF[combosDF.Driver.isin(racer_filter)]
-        if body_filter != []:
-            combosDF = combosDF[combosDF.Body.isin(body_filter)]
-        if tires_filter != []:
-            combosDF = combosDF[combosDF.Tires.isin(tires_filter)]
-        if glider_filter != []:
-            combosDF = combosDF[combosDF.Glider.isin(glider_filter)]
+def filterDF(combosDF, racer_filter, body_filter, tires_filter, glider_filter, noglider):
+    if noglider:
+        if any(
+            [racer_filter != [], body_filter != [],
+                tires_filter != []]
+        ):
+            if racer_filter != []:
+                combosDF = combosDF[combosDF.Driver.isin(racer_filter)]
+            if body_filter != []:
+                combosDF = combosDF[combosDF.Body.isin(body_filter)]
+            if tires_filter != []:
+                combosDF = combosDF[combosDF.Tires.isin(tires_filter)]
+    else:
+        if any(
+            [racer_filter != [], body_filter != [],
+                tires_filter != [], glider_filter != []]
+        ):
+            if racer_filter != []:
+                combosDF = combosDF[combosDF.Driver.isin(racer_filter)]
+            if body_filter != []:
+                combosDF = combosDF[combosDF.Body.isin(body_filter)]
+            if tires_filter != []:
+                combosDF = combosDF[combosDF.Tires.isin(tires_filter)]
+            if glider_filter != []:
+                combosDF = combosDF[combosDF.Glider.isin(glider_filter)]
     return combosDF
 
 
@@ -185,12 +199,20 @@ with st.sidebar.form("filters"):
     racer_filter = st.multiselect("Racers:", options.Driver)
     body_filter = st.multiselect("Body:", options.Body)
     tires_filter = st.multiselect("Tires:", options.Tires)
-    glider_filter = st.multiselect("Glider:", options.Glider)
+    glider_filter = []
+    if not noglidersbutt:
+        glider_filter = st.multiselect("Glider:", options.Glider)
 
     filters_submitted = st.form_submit_button("Submit")
-    combosDF = filterDF(
-        combosDF, racer_filter, body_filter, tires_filter, glider_filter
-    )
+    if noglidersbutt:
+        combosDF = filterDF(
+            combosDF, racer_filter, body_filter, tires_filter, glider_filter, nogliderbutt
+        )
+    else:
+        combosDF = filterDF(
+            combosDF, racer_filter, body_filter, tires_filter, glider_filter, nogliderbutt
+        )
+        
 
 # Display Main DataFrame
 st.dataframe(maindata, use_container_width=True)
