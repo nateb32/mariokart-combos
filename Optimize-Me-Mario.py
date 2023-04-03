@@ -69,7 +69,6 @@ if racer_filter!=[] or body_filter!=[] or tires_filter!=[] or glider_filter!=[]:
 
 
 # ----- USE OPTION BUTTONS ON DATAFRAME -----
-combosDF, maxrows, numrows = tools.cutdownDF(combosDF) # make dataframe smaller
 
 # -- Remove glider --
 if noglidersbutt:    
@@ -77,17 +76,17 @@ if noglidersbutt:
 
 # -- Optimized Sort --
 # Sorts by sum of mini-turbo and then total sum
-
 if optisortbutt:
     opticols = ["MT+SL", "Total Pts"]
     combosDF[opticols[0]] = combosDF.iloc[:, 4:].sum(axis=1)
     combosDF[opticols[1]] = combosDF["MT"] + combosDF["SL"]
     combosDF = combosDF.sort_values(by=opticols, ascending=False)
 
-allcombocols = list(combosDF.columns)
-setupcols = allcombocols[: allcombocols.index("WG")]
+combosDF, maxrows, numrows = tools.cutdownDF(combosDF) # make dataframe smaller
 
 # -- In-Game Stats Only --
+allcombocols = list(combosDF.columns)
+setupcols = allcombocols[: allcombocols.index("WG")]
 if gamestatsbutt:
     if optisortbutt:
         combosDF = combosDF[setupcols + tools.ingamestats_abrev + opticols]
