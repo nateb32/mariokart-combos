@@ -76,8 +76,8 @@ if noglidersbutt:
 # Sorts by sum of mini-turbo and then total sum
 if optisortbutt:
     opticols = ["MT+SL", "Total Pts"]
-    combosDF[opticols[0]] = combosDF.iloc[:, 4:].sum(axis=1)
-    combosDF[opticols[1]] = combosDF["MT"] + combosDF["SL"]
+    combosDF[opticols[1]] = combosDF.iloc[:, 4:].sum(axis=1)
+    combosDF[opticols[0]] = combosDF["MT"] + combosDF["SL"]
     combosDF = combosDF.sort_values(by=opticols, ascending=False)
 
 combosDF, maxrows, numrows = tools.cutdownDF(combosDF) # make dataframe smaller
