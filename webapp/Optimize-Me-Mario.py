@@ -1,8 +1,7 @@
 import plotly.express as px
 import streamlit as st
 from streamlit_extras.buy_me_a_coffee import button
-
-import utils.tools as tools
+from utils import tools
 
 # ----- MAKE WEBPAGE -----
 st.set_page_config(page_title="Optimize-Me-Mariokart", layout="wide")
