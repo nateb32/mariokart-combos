@@ -5,8 +5,8 @@ from streamlit_extras.buy_me_a_coffee import button
 
 from utils import tools
 
-with st.sidebar:
-    button(username="natebrawn", floating=False, width=221)
+# Hide Hamburger
+tools.hidehamburger()
 
 st.subheader(":orange[_Compare_] Your Racers!")
 st.markdown(":violet[Select the setups you would like to compare in the sidebar.]")
@@ -76,6 +76,8 @@ with st.sidebar:
         compsubmitted = st.form_submit_button(
             "**COMPARE THESE RACERS**", type="primary", use_container_width=True
         )
+
+    button(username="natebrawn", floating=False, width=221)
 
 if compsubmitted:
     # Make way to send warning if two options are equal
