@@ -65,8 +65,69 @@ ingamestats_abrev = [
     "OF",
 ]
 
-# ----- DISPLAY DATAFRAME -----
 combosDF = combosDF.reset_index(drop=True)
+# OPTION BUTTONS
+butt1, butt2, butt3, butt4, butt5 = st.columns(5)
+optisortbutt = butt1.checkbox(
+    "Optimized Sort", help="Sorts by MT+SL then total sum of all points"
+)
+statnamesbutt = butt2.checkbox("Show Stat Names")
+heatmapbutt = butt3.checkbox("Show HeatMap")
+gamestatsbutt = butt4.checkbox("Only In-Game Stats")
+noglidersbutt = butt5.checkbox("Remove Gliders")
+
+# ----- PRIORITIES FORM -----
+@st.cache_data
+def sortDF(combosDF, sortby):
+    return combosDF.sort_values(by=sortby, ascending=False)
+
+
+with st.sidebar.form("priorities"):
+    st.subheader(":green[PRIORITIZE YOUR STATS:]")
+    if gamestatsbutt:
+        statchoices = ingamestats
+    else:
+        statchoices = allstats
+    statpriorities = st.multiselect(
+        "Stat Priorities (order matters):",
+        statchoices,
+        help="In-Game Stats:  \n:blue[Ground Speed (SL)], :violet[Acceleration (AC)], :green[Weight (WG)],  \n:orange[Ground Handling (TL)], and :red[Off-Road Traction (OF)]",
+    )
+    sortvals = [prt[-3:-1] for prt in statpriorities]
+
+    priorities_submitted = st.form_submit_button("Submit")
+    if statpriorities != []:
+        combosDF = sortDF(combosDF, sortvals)
+
+
+# ----- FILTERS FORM -----
+def filterDF(combosDF, racer_filter, body_filter, tires_filter, glider_filter):
+    if racer_filter != []:
+        combosDF = combosDF[combosDF.Driver.isin(racer_filter)]
+    if body_filter != []:
+        combosDF = combosDF[combosDF.Body.isin(body_filter)]
+    if tires_filter != []:
+        combosDF = combosDF[combosDF.Tires.isin(tires_filter)]
+    if glider_filter != []:
+        combosDF = combosDF[combosDF.Glider.isin(glider_filter)]
+    return combosDF
+
+
+with st.sidebar.form("filters"):
+    st.subheader(":green[FILTERS]")
+    racer_filter = st.multiselect("Racers:", options.Driver)
+    body_filter = st.multiselect("Body:", options.Body)
+    tires_filter = st.multiselect("Tires:", options.Tires)
+    glider_filter = []
+    if not noglidersbutt:
+        glider_filter = st.multiselect("Glider:", options.Glider)
+
+    filters_submitted = st.form_submit_button("Submit")
+
+if racer_filter!=[] or body_filter!=[] or tires_filter!=[] or glider_filter!=[]:
+    combosDF = filterDF(
+        combosDF, racer_filter, body_filter, tires_filter, glider_filter
+    )
 
 # Show only top 1000 values
 maxrows = len(combosDF)
@@ -75,19 +136,14 @@ if maxrows > 1000:
     numrows = 1000
     combosDF = combosDF.iloc[:numrows, :]
 
-# OPTION BUTTONS
-butt1, butt2, butt3, butt4, butt5 = st.columns(5)
 
 # Remove glider
-if butt5.checkbox("Remove Gliders"):
+if noglidersbutt:    
     combosDF = tools.readData("MarioKart8D_Combos_nogliders.csv")
 
 
 # Optimized Sorting Button
 # Sorts by sum of mini-turbo and then total sum
-optisortbutt = butt1.checkbox(
-    "Optimized Sort", help="Sorts by MT+SL then total sum of all points"
-)
 if optisortbutt:
     opticols = ["Total Pts", "MT+SL"]
     combosDF[opticols[0]] = combosDF.iloc[:, 4:].sum(axis=1)
@@ -98,7 +154,6 @@ allcombocols = list(combosDF.columns)
 setupcols = allcombocols[: allcombocols.index("WG")]
 
 # In-Game Stats Only Button
-gamestatsbutt = butt4.checkbox("Only In-Game Stats")
 if gamestatsbutt:
     if opticols:
         combosDF = combosDF[setupcols + ingamestats_abrev + opticols]
@@ -106,7 +161,6 @@ if gamestatsbutt:
         combosDF = combosDF[setupcols + ingamestats_abrev]
 
 # Stat Names Button
-statnamesbutt = butt2.checkbox("Show Stat Names")
 if statnamesbutt:
     if gamestatsbutt:
         if optisortbutt:
@@ -120,7 +174,6 @@ if statnamesbutt:
             combosDF.columns = setupcols + allstats
 
 # HeatMap Button
-heatmapbutt = butt3.checkbox("Show HeatMap")
 if heatmapbutt:
     if maxrows >= 100:
         numrows = 100
@@ -136,86 +189,12 @@ if heatmapbutt:
         )
         .set_table_styles([dict(selector="th", props=[("text-align", "center")])])
     )
-    maindata = heatstyler.set_properties(
+    combosDF = heatstyler.set_properties(
         **{"text-align": "center"}).hide(axis="index")
-else:
-    maindata = combosDF
-
-
-# ----- PRIORITIES FORM -----
-@st.cache_data
-def sortDF(combosDF, sortby):
-    return combosDF.sort_values(by=sortby, ascending=False)
-
-
-with st.sidebar.form("priorities"):
-    st.subheader(":green[PRIORITIZE YOUR STATS:]")
-    if gamestatsbutt:
-        statchoices = ingamestats
-    statpriorities = st.multiselect(
-        "Stat Priorities (order matters):",
-        statchoices,
-        help="In-Game Stats:  \n:blue[Ground Speed (SL)], :violet[Acceleration (AC)], :green[Weight (WG)],  \n:orange[Ground Handling (TL)], and :red[Off-Road Traction (OF)]",
-    )
-    sortvals = [prt[-3:-1] for prt in statpriorities]
-
-    priorities_submitted = st.form_submit_button("Submit")
-    if statpriorities != []:
-        combosDF = sortDF(combosDF, sortvals)
-
-
-# ----- FILTERS FORM -----
-@st.cache_data
-def filterDF(combosDF, racer_filter, body_filter, tires_filter, glider_filter, noglider):
-    if noglider:
-        if any(
-            [racer_filter != [], body_filter != [],
-                tires_filter != []]
-        ):
-            if racer_filter != []:
-                combosDF = combosDF[combosDF.Driver.isin(racer_filter)]
-            if body_filter != []:
-                combosDF = combosDF[combosDF.Body.isin(body_filter)]
-            if tires_filter != []:
-                combosDF = combosDF[combosDF.Tires.isin(tires_filter)]
-    else:
-        if any(
-            [racer_filter != [], body_filter != [],
-                tires_filter != [], glider_filter != []]
-        ):
-            if racer_filter != []:
-                combosDF = combosDF[combosDF.Driver.isin(racer_filter)]
-            if body_filter != []:
-                combosDF = combosDF[combosDF.Body.isin(body_filter)]
-            if tires_filter != []:
-                combosDF = combosDF[combosDF.Tires.isin(tires_filter)]
-            if glider_filter != []:
-                combosDF = combosDF[combosDF.Glider.isin(glider_filter)]
-    return combosDF
-
-
-with st.sidebar.form("filters"):
-    st.subheader(":green[FILTERS]")
-    racer_filter = st.multiselect("Racers:", options.Driver)
-    body_filter = st.multiselect("Body:", options.Body)
-    tires_filter = st.multiselect("Tires:", options.Tires)
-    glider_filter = []
-    if not noglidersbutt:
-        glider_filter = st.multiselect("Glider:", options.Glider)
-
-    filters_submitted = st.form_submit_button("Submit")
-    if noglidersbutt:
-        combosDF = filterDF(
-            combosDF, racer_filter, body_filter, tires_filter, glider_filter, nogliderbutt
-        )
-    else:
-        combosDF = filterDF(
-            combosDF, racer_filter, body_filter, tires_filter, glider_filter, nogliderbutt
-        )
         
 
 # Display Main DataFrame
-st.dataframe(maindata, use_container_width=True)
+st.dataframe(combosDF, use_container_width=True)
 
 # Information below the dataframe
 st.markdown(
