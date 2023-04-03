@@ -16,10 +16,6 @@ hide_menu_style = """
         """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
 
-# Buy Me a Coffee Button
-with st.sidebar:
-    button(username="natebrawn", floating=False, width=221)
-
 # HEADER IMAGE AND INFO
 st.image("Racer Optimization Tool.png")
 # st.subheader(":orange[_Discover_] Your Racers!")
@@ -76,32 +72,9 @@ heatmapbutt = butt3.checkbox("Show HeatMap")
 gamestatsbutt = butt4.checkbox("Only In-Game Stats")
 noglidersbutt = butt5.checkbox("Remove Gliders")
 
-# ----- PRIORITIES FORM -----
+# ----- PRIORITIES and FILTERS FORM -----
 @st.cache_data
-def sortDF(combosDF, sortby):
-    return combosDF.sort_values(by=sortby, ascending=False)
-
-
-with st.sidebar.form("priorities"):
-    st.subheader(":green[PRIORITIZE YOUR STATS:]")
-    if gamestatsbutt:
-        statchoices = ingamestats
-    else:
-        statchoices = allstats
-    statpriorities = st.multiselect(
-        "Stat Priorities (order matters):",
-        statchoices,
-        help="In-Game Stats:  \n:blue[Ground Speed (SL)], :violet[Acceleration (AC)], :green[Weight (WG)],  \n:orange[Ground Handling (TL)], and :red[Off-Road Traction (OF)]",
-    )
-    sortvals = [prt[-3:-1] for prt in statpriorities]
-
-    priorities_submitted = st.form_submit_button("Submit")
-    if statpriorities != []:
-        combosDF = sortDF(combosDF, sortvals)
-
-
-# ----- FILTERS FORM -----
-def filterDF(combosDF, racer_filter, body_filter, tires_filter, glider_filter):
+def filterStats(combosDF, racer_filter, body_filter, tires_filter, glider_filter):
     if racer_filter != []:
         combosDF = combosDF[combosDF.Driver.isin(racer_filter)]
     if body_filter != []:
@@ -112,9 +85,26 @@ def filterDF(combosDF, racer_filter, body_filter, tires_filter, glider_filter):
         combosDF = combosDF[combosDF.Glider.isin(glider_filter)]
     return combosDF
 
+## SORTING FUNCTION
+@st.cache_data
+def sortStats(combosDF, sortby):
+    return combosDF.sort_values(by=sortby, ascending=False)
 
-with st.sidebar.form("filters"):
-    st.subheader(":green[FILTERS]")
+with st.sidebar.form("filters_and_priorities"):
+    # ----- PRIORITIES FORM -----
+    st.subheader(":green[PRIORITIES:]")
+    if gamestatsbutt:
+        statchoices = ingamestats
+    else:
+        statchoices = allstats
+    statpriorities = st.multiselect(
+        "Stat Priorities (order matters):",
+        statchoices,
+        help="In-Game Stats:  \n:blue[Ground Speed (SL)], :violet[Acceleration (AC)], :green[Weight (WG)],  \n:orange[Ground Handling (TL)], and :red[Off-Road Traction (OF)]",
+    )
+    sortvals = [prt[-3:-1] for prt in statpriorities]
+    # ----- FILTERS FORM -----
+    st.subheader(":green[FILTERS:]")
     racer_filter = st.multiselect("Racers:", options.Driver)
     body_filter = st.multiselect("Body:", options.Body)
     tires_filter = st.multiselect("Tires:", options.Tires)
@@ -122,12 +112,16 @@ with st.sidebar.form("filters"):
     if not noglidersbutt:
         glider_filter = st.multiselect("Glider:", options.Glider)
 
-    filters_submitted = st.form_submit_button("Submit")
+    filterspriorities_submitted = st.form_submit_button("Submit")
+
+if statpriorities != []:
+    combosDF = sortStats(combosDF, sortvals)
 
 if racer_filter!=[] or body_filter!=[] or tires_filter!=[] or glider_filter!=[]:
-    combosDF = filterDF(
+    combosDF = filterStats(
         combosDF, racer_filter, body_filter, tires_filter, glider_filter
     )
+
 
 # Show only top 1000 values
 maxrows = len(combosDF)
@@ -192,6 +186,8 @@ if heatmapbutt:
     combosDF = heatstyler.set_properties(
         **{"text-align": "center"}).hide(axis="index")
         
+if optisortbutt and statpriorities != []:
+    st.warning('When Optimized Sort is selected, sidebar priorities will not be shown.')
 
 # Display Main DataFrame
 st.dataframe(combosDF, use_container_width=True)
@@ -228,6 +224,11 @@ if excol2.button("I like graphs. Show me a Mini-Turbo vs Ground Speed one"):
         labels={"MT": "Mini-Turbo", "SL": "Ground Speed"},
     )
     st.plotly_chart(fig, theme="streamlit")
+
+
+# Buy Me a Coffee Button
+with st.sidebar:
+    button(username="natebrawn", floating=False, width=221)
 
 # ----- PROMPT TO PULL IN MARIO KART DATA ---
 st.sidebar.subheader(":orange[Stats out-of-date? ↓]")
