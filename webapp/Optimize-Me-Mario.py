@@ -11,13 +11,13 @@ st.set_page_config(page_title="Optimize-Me-Mario", layout="wide")
 tools.hidehamburger()
 
 # --- HEADER IMAGE AND INFO ---
-st.image("Racer Optimization Tool.png")
+st.image("assets/Racer Optimization Tool.png")
 st.markdown(
     ":violet[Select priorities and filtering in the sidebar for more useful results.]"
 )
 
 # ----- Read In CSV Data -----
-full_combosDF = tools.readData("MarioKart8D_Combos.csv")
+full_combosDF = tools.readData("data/MarioKart8D_Combos.csv")
 combosDF = full_combosDF
 combosDF = combosDF.reset_index(drop=True)
 
@@ -57,7 +57,7 @@ with st.sidebar.form("filters_and_priorities"):
     if not noglidersbutt:
         glider_filter = st.multiselect("Glider:", options.Glider)
 
-    filterspriorities_submitted = st.form_submit_button("Submit")
+    filterspriorities_submitted = st.form_submit_button("Submit", use_container_width=True,type='secondary')
 
 if statpriorities != []:
     combosDF = tools.sortStats(combosDF, sortvals)
@@ -73,10 +73,11 @@ combosDF, maxrows, numrows = tools.cutdownDF(combosDF) # make dataframe smaller
 
 # -- Remove glider --
 if noglidersbutt:    
-    combosDF = tools.readData("MarioKart8D_Combos_nogliders.csv")
+    combosDF = tools.readData("data/MarioKart8D_Combos_nogliders.csv")
 
 # -- Optimized Sort --
 # Sorts by sum of mini-turbo and then total sum
+
 if optisortbutt:
     opticols = ["Total Pts", "MT+SL"]
     combosDF[opticols[0]] = combosDF.iloc[:, 4:].sum(axis=1)
@@ -88,7 +89,7 @@ setupcols = allcombocols[: allcombocols.index("WG")]
 
 # -- In-Game Stats Only --
 if gamestatsbutt:
-    if opticols:
+    if optisortbutt:
         combosDF = combosDF[setupcols + tools.ingamestats_abrev + opticols]
     else:
         combosDF = combosDF[setupcols + tools.ingamestats_abrev]
