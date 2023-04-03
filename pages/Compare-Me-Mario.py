@@ -124,4 +124,4 @@ if compsubmitted:
     )
 
     st.altair_chart(chart, theme="streamlit")
-st.image("assets\Racer Optimization Tool.png")
+st.image("assets/Racer Optimization Tool.png")
