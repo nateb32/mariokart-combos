@@ -5,7 +5,7 @@ from streamlit_extras.buy_me_a_coffee import button
 import utils.tools as tools
 
 # ----- MAKE WEBPAGE -----
-st.set_page_config(page_title="Optimize-Me-Mario", layout="wide")
+st.set_page_config(page_title="Optimize-Me-Mariokart", layout="wide")
 
 # Hide Hamburger
 tools.hidehamburger()
