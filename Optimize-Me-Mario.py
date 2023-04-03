@@ -67,9 +67,7 @@ if racer_filter!=[] or body_filter!=[] or tires_filter!=[] or glider_filter!=[]:
         combosDF, racer_filter, body_filter, tires_filter, glider_filter
     )
 
-
 # ----- USE OPTION BUTTONS ON DATAFRAME -----
-
 # -- Remove glider --
 if noglidersbutt:    
     combosDF = tools.readData("data/MarioKart8D_Combos_nogliders.csv")
