@@ -11,7 +11,7 @@ with st.sidebar:
 st.subheader(":orange[_Compare_] Your Racers!")
 st.markdown(":violet[Select the setups you would like to compare in the sidebar.]")
 ## ----- BRING IN DATA -----
-full_combosDF = tools.readData("data\MarioKart8D_Combos.csv")
+full_combosDF = tools.readData("..data\MarioKart8D_Combos.csv")
 combosDF = full_combosDF
 # Get unique values of each item:
 options = tools.getOptions(full_combosDF)
